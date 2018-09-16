@@ -25,7 +25,7 @@ namespace SentenceStitcher
 
         #region Methods
 
-        public IEnumerable<string> GetIntersection()
+        public IEnumerable<string> GetIntersection(bool combine = false)
         {
             var indices = (A0: -1, A1: -1, B0: -1, B1: -1);
 
@@ -98,7 +98,45 @@ namespace SentenceStitcher
             var intersections = new List<string>();
 
             if (IsIntersecting())
-                intersections.AddRange(First.Fragments.GetRange(indices.A0, indices.A1 - indices.A0));
+            {
+                if (combine)
+                {
+                    if (indices.A0 == 0) // at beginning of first sentence
+                    {
+                        if (indices.B1 == Second.Fragments.Count) // at end of second sentence
+                        {
+                            var count = First.Fragments.Count - (indices.A1 - indices.A0);
+                            var firstPart = First.Fragments.GetRange(indices.A1, count);
+                            var secondPart = Second.Fragments;
+                            foreach (var s in firstPart)
+                            {
+                                secondPart.Add(s);
+                            }
+
+                            intersections.AddRange(secondPart);
+                        }
+                    }
+                    else if (indices.A1 == First.Fragments.Count) // end of first sentence
+                    {
+                        if (indices.B0 == 0) // at beginning of second sentence
+                        {
+                            var count = Second.Fragments.Count - (indices.B1 - indices.B0);
+                            var secondPart = Second.Fragments.GetRange(indices.B1, count);
+                            var firstPart = First.Fragments;
+                            foreach (var s in secondPart)
+                            {
+                                firstPart.Add(s);
+                            }
+
+                            intersections.AddRange(firstPart);
+                        }
+                    }
+                }
+                else
+                {
+                    intersections.AddRange(First.Fragments.GetRange(indices.A0, indices.A1 - indices.A0));
+                }
+            }
 
             return intersections;
         }

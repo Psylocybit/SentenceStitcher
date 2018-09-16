@@ -22,6 +22,12 @@ namespace SentenceStitcher
             this.Fragments = new List<string>(ProcessSegmentInput(this.Input));
         }
 
+        internal StitcherSegment(List<string> input)
+        {
+            this.Input = string.Empty;
+            this.Fragments = input;
+        }
+
         #endregion
 
         #region Properties

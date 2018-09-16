@@ -67,53 +67,47 @@ namespace SentenceStitcher
         {
             string result = string.Empty;
 
+            bool done = false;
             this.IsRunning = true;
 
             var resultRaw = new List<string>();
             var links = new Dictionary<int, List<SegmentLink>>();
 
-            for (int i = 0; i < Segments.Count; i++)
+            while (!done)
             {
-                links[i] = new List<SegmentLink>();
-
-                var segmentA = Segments[i];
-                var intersectMax = 0;
-                var maxIndex = -1;
-                bool yes = false;
-
-                for (int j = 0; j < Segments.Count; j++)
+                for (int i = 0; i < Segments.Count; i++)
                 {
-                    if (i == j)
-                        continue;
+                    links[i] = new List<SegmentLink>();
 
-                    var segmentB = Segments[j];
+                    var segmentA = Segments[i];
 
-                    var link = new SegmentLink(segmentA, segmentB);
-                    var intersections = (List<string>)link.GetIntersection();
-
-                    if (intersections.Count > intersectMax)
+                    for (int j = 0; j < Segments.Count; j++)
                     {
-                        maxIndex = j;
-                        intersectMax = intersections.Count;
-                        links[i].Add(link);
-                        yes = true;
+                        if (i == j)
+                            continue;
+
+                        var segmentB = Segments[j];
+
+                        var link = new SegmentLink(segmentA, segmentB);
+                        var intersections = (List<string>)link.GetIntersection(true);
+
+                        if (intersections.Count > 0)
+                        {
+                            var newSegment = new StitcherSegment(intersections);
+                            Console.WriteLine(newSegment.ToString());
+                            this.Segments.Remove(segmentA);
+                            this.Segments.Remove(segmentB);
+                            this.Segments.Add(newSegment);
+                        }
                     }
-                    else intersectMax = 0;
                 }
 
-                // join some o deez
-                if (yes)
-                    resultRaw.Add(segmentA.ToString() + Segments[maxIndex].ToString());
-
-                yes = false;
+                break;
             }
 
             this.IsRunning = false;
 
-            Console.WriteLine(resultRaw.Count);
-
-            foreach (var r in resultRaw)
-                Console.WriteLine(r);
+            result = this.Segments.ToFormattedString();
 
             return result;
         }

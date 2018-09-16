@@ -14,15 +14,16 @@ namespace SentenceStitcher
             var inputs = new string[]
             {
                 "This is a test.",
-                "For this to be a successful test",
+                "For this to be a successful test,",
                 "test, this test should reconstruct",
                 "a test. For this",
                 "should reconstruct these test",
                 "these test sentences properly."
             };
 
-            Stitcher stitcher = new Stitcher(inputs);
+            var stitcher = new Stitcher(inputs);
             stitcher.Process();
+            Console.WriteLine(stitcher.Process());
         }
     }
 }
