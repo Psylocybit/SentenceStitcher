@@ -8,8 +8,8 @@ namespace SentenceStitcher
     {
         static void Main(string[] args)
         {
-            var successfulResult =
-                "This is a test. For this to be a successful test, this test should reconstruct these sentences properly.";
+            //var successfulResult =
+            //    "This is a test. For this to be a successful test, this test should reconstruct these sentences properly.";
 
             var inputs = new string[]
             {
@@ -22,8 +22,8 @@ namespace SentenceStitcher
             };
 
             var stitcher = new Stitcher(inputs);
-            stitcher.Process();
-            Console.WriteLine(stitcher.Process());
+            var result = stitcher.Process();
+            Console.WriteLine(result);
         }
     }
 }

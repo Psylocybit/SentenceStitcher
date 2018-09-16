@@ -11,7 +11,6 @@ namespace SentenceStitcher
         {
             this.Segments = new List<StitcherSegment>(segments);
             this.IsRunning = false;
-            this.Workers = new List<StitcherWorker>();
         }
 
         public Stitcher(string[] inputs)
@@ -22,7 +21,6 @@ namespace SentenceStitcher
                 this.Segments.Add(new StitcherSegment(inputs[i]));
 
             this.IsRunning = false;
-            this.Workers = new List<StitcherWorker>();
         }
 
         #endregion
@@ -32,9 +30,7 @@ namespace SentenceStitcher
         public List<StitcherSegment> Segments { get; private set; }
 
         internal bool IsRunning { get; private set; }
-
-        private List<StitcherWorker> Workers { get; set; }
-
+        
         #endregion
 
         #region Calculated Properties
@@ -66,12 +62,10 @@ namespace SentenceStitcher
         public string Process()
         {
             string result = string.Empty;
-
             bool done = false;
-            this.IsRunning = true;
-
-            var resultRaw = new List<string>();
             var links = new Dictionary<int, List<SegmentLink>>();
+
+            this.IsRunning = true;
 
             while (!done)
             {
@@ -94,7 +88,6 @@ namespace SentenceStitcher
                         if (intersections.Count > 0)
                         {
                             var newSegment = new StitcherSegment(intersections);
-                            Console.WriteLine(newSegment.ToString());
                             this.Segments.Remove(segmentA);
                             this.Segments.Remove(segmentB);
                             this.Segments.Add(newSegment);
@@ -102,14 +95,36 @@ namespace SentenceStitcher
                     }
                 }
 
-                break;
+                if (this.Segments.Count == 1)
+                    done = true;
+            }
+
+            var resultList = new List<string>();
+
+            foreach (var s in this.Segments)
+                foreach (var f in s.Fragments)
+                    resultList.Add(f);
+
+            while (resultList.Count > 1)
+            {
+                string a = resultList[0];
+                string b = resultList[1];
+                string ab;
+
+                if (a[a.Length - 1] == ',' || a[a.Length - 1] == '.')
+                    ab = string.Join(' ', a, b);
+                else if (b[b.Length - 1] == ',' || b[b.Length - 1] == '.')
+                    ab = string.Join(new char(), a, b);
+                else
+                    ab = string.Join(' ', a, b);
+
+                resultList.RemoveAt(1);
+                resultList[0] = ab;
             }
 
             this.IsRunning = false;
 
-            result = this.Segments.ToFormattedString();
-
-            return result;
+            return resultList[0];
         }
 
         public override string ToString()
