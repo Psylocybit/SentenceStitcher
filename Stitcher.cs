@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SentenceStitcher
 {
@@ -7,20 +8,16 @@ namespace SentenceStitcher
     {
         #region Constructors
 
-        public Stitcher(StitcherSegment[] segments)
+        public Stitcher(IEnumerable<string> stringInputs)
         {
-            this.Segments = new List<StitcherSegment>(segments);
             this.IsRunning = false;
+            this.Segments = stringInputs.Select(s => new StitcherSegment(s)).ToList();
         }
 
-        public Stitcher(string[] inputs)
+        public Stitcher(IEnumerable<StitcherSegment> segments)
         {
-            this.Segments = new List<StitcherSegment>(inputs.Length);
-
-            for (var i = 0; i < inputs.Length; i++)
-                this.Segments.Add(new StitcherSegment(inputs[i]));
-
             this.IsRunning = false;
+            this.Segments = segments.ToList();
         }
 
         #endregion
